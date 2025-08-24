@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -37,13 +39,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody User in) {
+    public ResponseEntity<User> create(@Valid @RequestBody User in) {
         User saved = repo.save(in);
         return ResponseEntity.created(URI.create("/users/" + saved.getId())).body(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User in) {
+    public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody User in) {
         Optional<User> opt = repo.findById(id);
         if (opt.isEmpty()) {
             return ResponseEntity.notFound().build();
