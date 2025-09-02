@@ -18,6 +18,10 @@ import jakarta.validation.Valid;
 public class ProductController {
     private ProductRepository repo;
 
+    public ProductController(ProductRepository repo) {
+        this.repo = repo;
+    }
+
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = repo.findAll();
