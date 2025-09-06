@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,5 +39,15 @@ public class ProductController {
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
         Product createProduct = repo.save(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(createProduct);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(@Valid @PathVariable Long id, @Valid @RequestBody Product product) {
+        Product updateProduct = repo.findById(id).orElseThrow();
+        updateProduct.setName(product.getName());
+        updateProduct.setPrice(product.getPrice());
+        updateProduct.setStock(product.getStock());
+        repo.save(updateProduct);
+        return ResponseEntity.ok(updateProduct);
     }
 }
