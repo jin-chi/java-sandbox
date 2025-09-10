@@ -1,5 +1,6 @@
 package com.example.productsbasic;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,15 +8,18 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // RequestBody バリデーションエラー (400)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -33,6 +37,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    // RequestParam でバリデーションエラー (400)
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -48,6 +53,29 @@ public class GlobalExceptionHandler {
         errorResponse.setErrorDetails(errorDetails);
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    // URI Not Found (404)
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<MyProblemDetail> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+        String detail = ex.getMessage();
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.NOT_FOUND,
+                detail,
+                URI.create("about:blank"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    // HTTP Method Error (405)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<MyProblemDetail> handleHttpRequestMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException ex) {
+        String detail = ex.getMessage();
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                detail,
+                URI.create("about:blank"));
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(problemDetail);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
