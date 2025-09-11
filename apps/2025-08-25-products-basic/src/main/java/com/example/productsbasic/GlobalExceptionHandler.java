@@ -89,7 +89,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
-    // HTTP Method Error (405)
+    // HTTP Method Error (カスタム例外) (405)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<MyProblemDetail> handleHttpRequestMethodNotSupportedException(
             HttpRequestMethodNotSupportedException ex) {
