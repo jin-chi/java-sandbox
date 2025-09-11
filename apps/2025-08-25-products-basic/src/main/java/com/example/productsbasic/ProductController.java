@@ -2,7 +2,6 @@ package com.example.productsbasic;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,7 +34,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         Product product = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ユーザーID " + id + " が存在しません"));
+                .orElseThrow(() -> new ResourceNotFoundException("ユーザーID " + id + " が存在しません"));
         return ResponseEntity.ok(product);
     }
 
@@ -53,7 +52,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@Valid @PathVariable Long id, @Valid @RequestBody Product product) {
         Product updateProduct = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ユーザーID: " + id + " が存在しません"));
+                .orElseThrow(() -> new ResourceNotFoundException("ユーザーID: " + id + " が存在しません"));
         updateProduct.setName(product.getName());
         updateProduct.setPrice(product.getPrice());
         updateProduct.setStock(product.getStock());
@@ -63,11 +62,10 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@Valid @PathVariable Long id) {
-        Optional<Product> productOptional = repo.findById(id);
-        if (productOptional.isPresent()) {
+        if (repo.existsById(id)) {
             repo.deleteById(id);
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.notFound().build();
+        throw new ResourceNotFoundException("ユーザーID: " + id + " が存在しません");
     }
 }
