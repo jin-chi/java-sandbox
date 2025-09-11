@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -55,9 +56,31 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    // JSON 解析エラー (400)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<MyProblemDetail> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        String detail = ex.getMessage();
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.BAD_REQUEST,
+                detail,
+                URI.create("about:blank"));
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
     // URI Not Found (404)
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<MyProblemDetail> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+        String detail = ex.getMessage();
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.NOT_FOUND,
+                detail,
+                URI.create("about:blank"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    // Resource Not Found (404)
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<MyProblemDetail> handleResourceNotFoundException(ResourceNotFoundException ex) {
         String detail = ex.getMessage();
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
                 HttpStatus.NOT_FOUND,
@@ -76,20 +99,6 @@ public class GlobalExceptionHandler {
                 detail,
                 URI.create("about:blank"));
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(problemDetail);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        List<String> errorDetail = new ArrayList<>();
-        errorDetail.add(ex.getMessage());
-
-        errorResponse.setStatus(404);
-        errorResponse.setMessage("Not Found Elements");
-        errorResponse.setTimestamp(Instant.now());
-        errorResponse.setErrorDetails(errorDetail);
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
