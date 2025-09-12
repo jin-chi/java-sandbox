@@ -1,9 +1,11 @@
 package com.example.productsbasic;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import jakarta.validation.ConstraintViolationException;
@@ -22,91 +25,112 @@ public class GlobalExceptionHandler {
 
     // RequestBody バリデーションエラー (400)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        ErrorResponse errorResponse = new ErrorResponse();
+    public ResponseEntity<MyProblemDetail> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
+            WebRequest request) {
 
-        List<String> errorDetails = new ArrayList<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            errorDetails.add(error.getDefaultMessage());
-        });
+        List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map((error) -> {
+                    Map<String, String> fieldMap = new LinkedHashMap<>();
+                    fieldMap.put("field", error.getField());
+                    fieldMap.put("defaultMessage", error.getDefaultMessage());
+                    return fieldMap;
+                }).collect(Collectors.toList());
 
-        errorResponse.setStatus(400);
-        errorResponse.setMessage("Validation Error");
-        errorResponse.setTimestamp(Instant.now());
-        errorResponse.setErrorDetails(errorDetails);
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed to request body.",
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false)));
+        problemDetail.setErrors(errors);
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
     // RequestParam でバリデーションエラー (400)
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
-        ErrorResponse errorResponse = new ErrorResponse();
+    public ResponseEntity<MyProblemDetail> handleConstraintViolationException(ConstraintViolationException ex,
+            WebRequest request) {
 
-        List<String> errorDetails = new ArrayList<>();
-        ex.getConstraintViolations().forEach((error) -> {
-            errorDetails.add(error.getMessage());
-        });
+        List<Map<String, String>> errors = ex.getConstraintViolations().stream()
+                .map((error) -> {
+                    Map<String, String> fieldMap = new LinkedHashMap<>();
+                    fieldMap.put("field", error.getPropertyPath().toString());
+                    fieldMap.put("message", error.getMessage());
+                    return fieldMap;
+                }).collect(Collectors.toList());
 
-        errorResponse.setStatus(400);
-        errorResponse.setMessage("Parameter Error");
-        errorResponse.setTimestamp(Instant.now());
-        errorResponse.setErrorDetails(errorDetails);
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.BAD_REQUEST,
+                "Validation failed to request URI.",
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false)));
+        problemDetail.setErrors(errors);
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
-    // JSON 解析エラー (400)
+    // JSON(request body) 解析エラー (400)
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<MyProblemDetail> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+    public ResponseEntity<MyProblemDetail> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex,
+            WebRequest request) {
         String detail = ex.getMessage();
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
                 HttpStatus.BAD_REQUEST,
                 detail,
-                URI.create("about:blank"));
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false)));
+
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
     // URI Not Found (404)
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<MyProblemDetail> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+    public ResponseEntity<MyProblemDetail> handleNoHandlerFoundException(NoHandlerFoundException ex,
+            WebRequest request) {
         String detail = ex.getMessage();
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
                 HttpStatus.NOT_FOUND,
                 detail,
-                URI.create("about:blank"));
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false)));
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
     // Resource Not Found (404)
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<MyProblemDetail> handleResourceNotFoundException(ResourceNotFoundException ex) {
+    public ResponseEntity<MyProblemDetail> handleResourceNotFoundException(ResourceNotFoundException ex,
+            WebRequest request) {
         String detail = ex.getMessage();
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
                 HttpStatus.NOT_FOUND,
                 detail,
-                URI.create("about:blank"));
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false)));
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
     // HTTP Method Error (カスタム例外) (405)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<MyProblemDetail> handleHttpRequestMethodNotSupportedException(
-            HttpRequestMethodNotSupportedException ex) {
+            HttpRequestMethodNotSupportedException ex, WebRequest request) {
         String detail = ex.getMessage();
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
                 HttpStatus.METHOD_NOT_ALLOWED,
                 detail,
-                URI.create("about:blank"));
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false)));
+
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(problemDetail);
     }
 
+    // データ重複エラー (409)
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        ErrorResponse errorResponse = new ErrorResponse();
+    public ResponseEntity<MyProblemDetail> handleDataIntegrityViolationException(DataIntegrityViolationException ex,
+            WebRequest request) {
         List<String> errorDetails = new ArrayList<>();
-
-        String errorMessage = ex.getMessage();
+        String errorMessage = ex.getMostSpecificCause().toString();
 
         if (errorMessage.contains("Unique index or primary key violation")) {
             errorDetails.add("同じ商品名は登録できません");
@@ -114,11 +138,25 @@ public class GlobalExceptionHandler {
             errorDetails.add(errorMessage);
         }
 
-        errorResponse.setStatus(409);
-        errorResponse.setMessage("Conflict Error");
-        errorResponse.setTimestamp(Instant.now());
-        errorResponse.setErrorDetails(errorDetails);
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.CONFLICT,
+                errorMessage,
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false)));
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
+    }
+
+    // その他エラー
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<MyProblemDetail> handleOtherException(Exception ex, WebRequest request) {
+        String detail = ex.getMessage();
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                detail,
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false)));
+
+        return ResponseEntity.internalServerError().body(problemDetail);
     }
 }
