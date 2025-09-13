@@ -1,4 +1,4 @@
-package com.example.productsbasic;
+package com.example.productsbasic.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package com.example.productsbasic;
+package com.example.productsbasic.exception;
 
 import java.net.URI;
 import java.time.Instant;
