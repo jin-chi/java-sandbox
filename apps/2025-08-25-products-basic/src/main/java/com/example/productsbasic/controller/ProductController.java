@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.example.productsbasic.dto.ProductCreateUpdateResponseDto;
 import com.example.productsbasic.dto.ProductGetResponseDto;
 import com.example.productsbasic.dto.ProductRequestDto;
 import com.example.productsbasic.entity.Product;
 import com.example.productsbasic.exception.ResourceNotFoundException;
+import com.example.productsbasic.mapper.ProductMapper;
 import com.example.productsbasic.respository.ProductRepository;
 
 import jakarta.validation.Valid;
@@ -27,6 +29,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/products")
 public class ProductController {
     private ProductRepository repo;
+    private ProductMapper mapper;
 
     public ProductController(ProductRepository repo) {
         this.repo = repo;
@@ -36,7 +39,7 @@ public class ProductController {
     public ResponseEntity<List<ProductGetResponseDto>> getAllProducts() {
         List<Product> products = repo.findAll();
         return ResponseEntity.ok(products.stream()
-                .map(ProductGetResponseDto::fromEntity)
+                .map(mapper::toGetResponseDto)
                 .collect(Collectors.toList()));
     }
 
@@ -44,22 +47,22 @@ public class ProductController {
     public ResponseEntity<ProductGetResponseDto> getProductById(@PathVariable Long id) {
         Product product = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ユーザーID " + id + " が存在しません"));
-        return ResponseEntity.ok(ProductGetResponseDto.fromEntity(product));
+        return ResponseEntity.ok(mapper.toGetResponseDto(product));
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody ProductRequestDto req) {
-        Product createProduct = repo.save(Product.from(req));
+    public ResponseEntity<ProductCreateUpdateResponseDto> createProduct(@Valid @RequestBody ProductRequestDto req) {
+        Product createProduct = repo.save(mapper.toEntity(req));
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(createProduct.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(createProduct);
+        return ResponseEntity.created(location).body(mapper.toCreateUpdateResponseDto(createProduct));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@Valid @PathVariable Long id,
+    public ResponseEntity<ProductCreateUpdateResponseDto> updateProduct(@Valid @PathVariable Long id,
             @Valid @RequestBody ProductRequestDto req) {
         Product updateProduct = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ユーザーID: " + id + " が存在しません"));
@@ -67,7 +70,7 @@ public class ProductController {
         updateProduct.setPrice(req.price());
         updateProduct.setStock(req.stock());
         repo.save(updateProduct);
-        return ResponseEntity.ok(updateProduct);
+        return ResponseEntity.ok(mapper.toCreateUpdateResponseDto(updateProduct));
     }
 
     @DeleteMapping("/{id}")
