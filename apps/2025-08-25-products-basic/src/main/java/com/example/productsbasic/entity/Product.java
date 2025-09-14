@@ -3,8 +3,6 @@ package com.example.productsbasic.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.productsbasic.dto.ProductRequestDto;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -87,9 +85,5 @@ public class Product {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public static Product from(ProductRequestDto req) {
-        return new Product(req.name(), req.price(), req.stock());
     }
 }
