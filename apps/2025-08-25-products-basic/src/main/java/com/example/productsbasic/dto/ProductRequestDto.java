@@ -17,7 +17,7 @@ public record ProductRequestDto(
 
     @NotNull
     @DecimalMin(value = "0", inclusive = true)
-    @Digits(integer = 10, fraction = 2, message = "10桁までかつ小数点2桁までの金額を指定してください")
+    @Digits(integer = 9, fraction = 2, message = "10桁までかつ小数点2桁までの金額を指定してください")
     BigDecimal price,
 
     @NotNull
