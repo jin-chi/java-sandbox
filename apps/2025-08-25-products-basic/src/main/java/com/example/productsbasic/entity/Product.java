@@ -1,4 +1,4 @@
-package com.example.productsbasic;
+package com.example.productsbasic.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,12 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "products")
@@ -25,23 +19,16 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @NotNull
-    @Column(nullable = false)
-    @DecimalMin(value = "0", inclusive = true)
-    @Digits(integer = 10, fraction = 2, message = "10桁までかつ小数点2桁までの金額を指定してください")
+    @Column(nullable = false, precision = 9, scale = 2)
     private BigDecimal price;
 
-    @NotNull
-    @Column(nullable = false)
-    @Min(value = 0, message = "0以上の数値を指定してください")
+    @Column(nullable = false, precision = 9)
     private Integer stock;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     // parameterrized constructor
