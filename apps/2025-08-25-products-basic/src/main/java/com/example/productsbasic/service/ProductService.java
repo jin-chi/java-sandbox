@@ -45,7 +45,7 @@ public class ProductService {
         product.setName(req.name());
         product.setPrice(req.price());
         product.setStock(req.stock());
-        return mapper.toCreateUpdateResponseDto(product);
+        return mapper.toCreateUpdateResponseDto(repo.save(product));
     }
 
     public boolean deleteProduct(Long id) {
