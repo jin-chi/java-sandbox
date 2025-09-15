@@ -19,8 +19,9 @@ public class ProductService {
     private ProductRepository repo;
     private ProductMapper mapper;
 
-    public ProductService(ProductRepository repo) {
+    public ProductService(ProductRepository repo, ProductMapper mapper) {
         this.repo = repo;
+        this.mapper = mapper;
     }
 
     public List<ProductGetResponseDto> getAllProducts() {

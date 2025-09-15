@@ -31,8 +31,9 @@ public class ProductController {
     private ProductService service;
     private ProductMapper mapper;
 
-    public ProductController(ProductService service) {
+    public ProductController(ProductService service, ProductMapper mapper) {
         this.service = service;
+        this.mapper = mapper;
     }
 
     @GetMapping
