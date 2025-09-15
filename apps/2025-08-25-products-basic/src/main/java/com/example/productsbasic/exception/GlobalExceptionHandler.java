@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 "Validation failed to request body.",
                 URI.create("about:blank"),
-                URI.create(request.getDescription(false)));
+                URI.create(request.getDescription(false).substring(4)));
         problemDetail.setErrors(errors);
 
         return ResponseEntity.badRequest().body(problemDetail);
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 "Validation failed to request URI.",
                 URI.create("about:blank"),
-                URI.create(request.getDescription(false)));
+                URI.create(request.getDescription(false).substring(4)));
         problemDetail.setErrors(errors);
 
         return ResponseEntity.badRequest().body(problemDetail);
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 detail,
                 URI.create("about:blank"),
-                URI.create(request.getDescription(false)));
+                URI.create(request.getDescription(false).substring(4)));
 
         return ResponseEntity.badRequest().body(problemDetail);
     }
@@ -92,7 +92,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 detail,
                 URI.create("about:blank"),
-                URI.create(request.getDescription(false)));
+                URI.create(request.getDescription(false).substring(4)));
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 detail,
                 URI.create("about:blank"),
-                URI.create(request.getDescription(false)));
+                URI.create(request.getDescription(false).substring(4)));
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
@@ -120,7 +120,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.METHOD_NOT_ALLOWED,
                 detail,
                 URI.create("about:blank"),
-                URI.create(request.getDescription(false)));
+                URI.create(request.getDescription(false).substring(4)));
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(problemDetail);
     }
@@ -142,7 +142,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT,
                 errorMessage,
                 URI.create("about:blank"),
-                URI.create(request.getDescription(false)));
+                URI.create(request.getDescription(false).substring(4)));
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
@@ -155,7 +155,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 detail,
                 URI.create("about:blank"),
-                URI.create(request.getDescription(false)));
+                URI.create(request.getDescription(false).substring(4)));
 
         return ResponseEntity.internalServerError().body(problemDetail);
     }
