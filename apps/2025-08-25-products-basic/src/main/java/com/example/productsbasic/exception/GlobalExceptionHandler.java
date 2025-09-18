@@ -29,12 +29,10 @@ public class GlobalExceptionHandler {
             WebRequest request) {
 
         List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
-                .map((error) -> {
-                    Map<String, String> fieldMap = new LinkedHashMap<>();
-                    fieldMap.put("field", error.getField());
-                    fieldMap.put("defaultMessage", error.getDefaultMessage());
-                    return fieldMap;
-                }).collect(Collectors.toList());
+                .map((error) -> Map.of(
+                    "field", error.getField(),
+                    "defaultMessage", error.getDefaultMessage()
+                )).toList();
 
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
                 HttpStatus.BAD_REQUEST,
