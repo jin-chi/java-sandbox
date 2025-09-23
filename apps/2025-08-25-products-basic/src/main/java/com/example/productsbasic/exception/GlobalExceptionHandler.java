@@ -16,7 +16,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -30,9 +31,9 @@ public class GlobalExceptionHandler {
 
         List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map((error) -> Map.of(
-                    "field", error.getField(),
-                    "defaultMessage", error.getDefaultMessage()
-                )).toList();
+                        "field", error.getField(),
+                        "defaultMessage", error.getDefaultMessage()))
+                .toList();
 
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
                 HttpStatus.BAD_REQUEST,
@@ -81,9 +82,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
+    // Path の型違いエラー (400)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<MyProblemDetail> handleMethodArgumentMismatchException(MethodArgumentTypeMismatchException ex,
+            WebRequest request) {
+        String detail = ex.getMessage();
+        MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
+                HttpStatus.BAD_REQUEST,
+                detail,
+                URI.create("about:blank"),
+                URI.create(request.getDescription(false).substring(4)));
+
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
     // URI Not Found (404)
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<MyProblemDetail> handleNoHandlerFoundException(NoHandlerFoundException ex,
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<MyProblemDetail> handleNoResourceFoundException(NoResourceFoundException ex,
             WebRequest request) {
         String detail = ex.getMessage();
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
@@ -154,6 +169,8 @@ public class GlobalExceptionHandler {
                 detail,
                 URI.create("about:blank"),
                 URI.create(request.getDescription(false).substring(4)));
+
+        problemDetail.setProperty("exceptionName", ex.getClass());
 
         return ResponseEntity.internalServerError().body(problemDetail);
     }
