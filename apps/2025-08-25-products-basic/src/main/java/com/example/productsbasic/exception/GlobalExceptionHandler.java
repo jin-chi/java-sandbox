@@ -142,20 +142,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<MyProblemDetail> handleDataIntegrityViolationException(DataIntegrityViolationException ex,
             WebRequest request) {
-        List<String> errorDetails = new ArrayList<>();
+        List<Map<String, String>> errorDetails = new ArrayList<>();
         String errorMessage = ex.getMostSpecificCause().toString();
-
-        if (errorMessage.contains("Unique index or primary key violation")) {
-            errorDetails.add("同じ商品名は登録できません");
-        } else {
-            errorDetails.add(errorMessage);
-        }
 
         MyProblemDetail problemDetail = MyProblemDetail.forStatusAndDetailAndType(
                 HttpStatus.CONFLICT,
                 errorMessage,
                 URI.create("about:blank"),
                 URI.create(request.getDescription(false).substring(4)));
+
+        if (errorMessage.contains("Unique index or primary key violation")) {
+            errorDetails.add(Map.of("errorMessage", "同じ商品名は登録できません"));
+            problemDetail.setErrors(errorDetails);
+        }
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
