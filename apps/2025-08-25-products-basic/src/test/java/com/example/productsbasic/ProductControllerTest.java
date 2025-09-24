@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.json.JsonCompareMode;
@@ -371,6 +372,27 @@ public class ProductControllerTest {
     }
 
     @Test
+    void put_resourceNotFound_404_notFound() throws Exception {
+        ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
+        String requestDtoJson = objectMapper.writeValueAsString(requestDto);
+
+        when(service.updateProduct(eq(999L), any(ProductRequestDto.class)))
+                .thenThrow(new ResourceNotFoundException("ユーザーID: 999 が存在しません"));
+
+        mockMvc.perform(put("/products/{id}", "999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestDtoJson))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").value("ユーザーID: 999 が存在しません"))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/products/999"))
+                .andExpect(jsonPath("$.title").value("Not Found"));
+    }
+
+    @Test
     void put_findAll_405_methodNotAllowed() throws Exception {
         mockMvc.perform(put("/products"))
                 .andDo(print())
@@ -382,7 +404,103 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Method Not Allowed"));
     }
 
+    @Test
+    void put_save_409_conflict() throws Exception {
+        ProductRequestDto requestDto = new ProductRequestDto("Conflict Product", BigDecimal.valueOf(1000), 10);
+        String requestDtoJson = objectMapper.writeValueAsString(requestDto);
+
+        when(service.updateProduct(1L, requestDto))
+                .thenThrow(new DataIntegrityViolationException("Unique index or primary key violation"));
+
+        mockMvc.perform(put("/products/{id}", "1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestDtoJson))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.detail").value(
+                        "org.springframework.dao.DataIntegrityViolationException: Unique index or primary key violation"))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/products/1"))
+                .andExpect(jsonPath("$.title").value("Conflict"))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", containsInAnyOrder(
+                        allOf(hasEntry("errorMessage", "同じ商品名は登録できません")))));
+    }
+
+    @Test
+    void put_save_500_internalServerError() throws Exception {
+        ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
+        when(service.updateProduct(eq(1L), any(ProductRequestDto.class)))
+                .thenThrow(new RuntimeException("予期せぬエラーが発生しました"));
+
+        mockMvc.perform(put("/products/{id}", "1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.detail").value("予期せぬエラーが発生しました"))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/products/1"))
+                .andExpect(jsonPath("$.title").value("Internal Server Error"));
+    }
+
     // ----- DELETE ----- //
+
+    @Test
+    void delete_deleteById_204_noContent() throws Exception {
+        when(service.deleteProduct(1L)).thenReturn(true);
+
+        mockMvc.perform(delete("/products/{id}", "1"))
+                .andDo(print())
+                .andExpect(header().doesNotExist("Content-Type"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void delete_badPathParam_400_badRequest() throws Exception {
+        mockMvc.perform(delete("/products/{id}", "abc"))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").value(
+                        "Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: \"abc\""))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/products/abc"))
+                .andExpect(jsonPath("$.title").value("Bad Request"));
+    }
+
+    @Test
+    void delete_badUri_400_badRequest() throws Exception {
+        mockMvc.perform(delete("/bad-products"))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").value("No static resource bad-products."))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/bad-products"))
+                .andExpect(jsonPath("$.title").value("Not Found"));
+    }
+
+    @Test
+    void delete_resourceNotFound_404_notFound() throws Exception {
+        when(service.deleteProduct(999L)).thenReturn(false);
+
+        mockMvc.perform(delete("/products/{id}", "999"))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").value("ユーザーID: 999 が存在しません"))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/products/999"))
+                .andExpect(jsonPath("$.title").value("Not Found"));
+    }
 
     @Test
     void delete_findAll_405_methodNotAllowed() throws Exception {
@@ -390,9 +508,25 @@ public class ProductControllerTest {
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value(405))
                 .andExpect(jsonPath("$.detail").value("Request method 'DELETE' is not supported"))
                 .andExpect(jsonPath("$.type").value("about:blank"))
                 .andExpect(jsonPath("$.instance").value("/products"))
                 .andExpect(jsonPath("$.title").value("Method Not Allowed"));
+    }
+
+    @Test
+    void delete_interNalServerError_500() throws Exception {
+        when(service.deleteProduct(1L)).thenThrow(new RuntimeException("予期せぬエラーが発生しました"));
+
+        mockMvc.perform(delete("/products/{id}", "1"))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.detail").value("予期せぬエラーが発生しました"))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/products/1"))
+                .andExpect(jsonPath("$.title").value("Internal Server Error"));
     }
 }
