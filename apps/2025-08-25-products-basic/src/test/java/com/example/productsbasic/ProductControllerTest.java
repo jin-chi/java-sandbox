@@ -98,6 +98,19 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Bad Request"));
     }
 
+    @Test // NotResourceFoundException
+    void get_badUri_404_notFound() throws Exception {
+        mockMvc.perform(get("/not-exists-uri"))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").value("No static resource not-exists-uri."))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/not-exists-uri"))
+                .andExpect(jsonPath("$.title").value("Not Found"));
+    }
+
     @Test // ResourceNotFoundException
     void get_findById_404_notFound() throws Exception {
         when(service.getProductById(999L)).thenThrow(new ResourceNotFoundException("ユーザーID: 999 が存在しません"));
@@ -224,6 +237,24 @@ public class ProductControllerTest {
                         allOf(
                                 hasEntry("field", "stock"),
                                 hasEntry("defaultMessage", "0以上の数値を指定してください")))));
+    }
+
+    @Test // NotResourceFoundException
+    void post_badUri_404_notFound() throws Exception {
+        ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
+        String requestDtoJson = objectMapper.writeValueAsString(requestDto);
+
+        mockMvc.perform(post("/not-exists-uri")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestDtoJson))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.detail").value("No static resource not-exists-uri."))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/not-exists-uri"))
+                .andExpect(jsonPath("$.title").value("Not Found"));
     }
 
     @Test // HttpRequestMethodNotSupportedException
