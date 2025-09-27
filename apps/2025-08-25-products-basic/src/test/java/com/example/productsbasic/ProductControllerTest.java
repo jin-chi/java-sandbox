@@ -84,7 +84,7 @@ public class ProductControllerTest {
                 .andExpect(content().json(responseDtoJson, JsonCompareMode.STRICT));
     }
 
-    @Test
+    @Test // MethodArgumentTypeMismatchException
     void getfindById_400_badRequest() throws Exception {
         mockMvc.perform(get("/products/{id}", "abc"))
                 .andDo(print())
@@ -98,7 +98,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Bad Request"));
     }
 
-    @Test
+    @Test // ResourceNotFoundException
     void get_findById_404_notFound() throws Exception {
         when(service.getProductById(999L)).thenThrow(new ResourceNotFoundException("ユーザーID: 999 が存在しません"));
 
@@ -113,7 +113,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Not Found"));
     }
 
-    @Test
+    @Test // Other Exception
     void get_findAll_500_internalServerError() throws Exception {
         when(service.getAllProducts()).thenThrow(new RuntimeException("予期せぬエラーが発生しました"));
 
@@ -129,7 +129,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.exceptionName").value("java.lang.RuntimeException"));
     }
 
-    @Test
+    @Test // Other Exception
     void get_findById_500_internalServerError() throws Exception {
         when(service.getProductById(1L)).thenThrow(new RuntimeException("予期せぬエラーが発生しました"));
 
@@ -173,7 +173,7 @@ public class ProductControllerTest {
                 .andExpect(content().json(responseDtoJson, JsonCompareMode.STRICT));
     }
 
-    @Test
+    @Test // HttpMessaegNotReadableException
     void post_badJson_400_badRequest() throws Exception {
         String requestDtoBadJson = """
                 {
@@ -197,7 +197,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Bad Request"));
     }
 
-    @Test
+    @Test // MethodArbumentNotValidException
     void post_requestBody_validationFaild_400_badRequest() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("", BigDecimal.valueOf(-1), -10);
         String requestDtoJson = objectMapper.writeValueAsString(requestDto);
@@ -226,7 +226,7 @@ public class ProductControllerTest {
                                 hasEntry("defaultMessage", "0以上の数値を指定してください")))));
     }
 
-    @Test
+    @Test // HttpRequestMethodNotSupportedException
     void post_bad_405_badRequest() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
         mockMvc.perform(post("/products/{id}", '1')
@@ -242,7 +242,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Method Not Allowed"));
     }
 
-    @Test
+    @Test // Other Exception
     void post_save_500_internalServerError() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 1000);
         when(service.createProduct(any(ProductRequestDto.class))).thenThrow(new RuntimeException("予期せぬエラーが発生しました"));
@@ -281,7 +281,7 @@ public class ProductControllerTest {
                 .andExpect(content().json(responseDtoJson, JsonCompareMode.STRICT));
     }
 
-    @Test
+    @Test // HttpMessageNotReadableException
     void put_badJson_400_badRequest() throws Exception {
         String requestDtoBadJson = """
                 {
@@ -305,7 +305,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Bad Request"));
     }
 
-    @Test
+    @Test // MethodArgumentTypeMismatchException
     void put_badPathParam_400_badRequest() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
         String requestDtoJson = objectMapper.writeValueAsString(requestDto);
@@ -324,7 +324,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Bad Request"));
     }
 
-    @Test
+    @Test // MethodArgumentNotValidException
     void put_requestBody_validationFaild_400_badRequest() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("", BigDecimal.valueOf(-1), -10);
         String requestDtoJson = objectMapper.writeValueAsString(requestDto);
@@ -353,25 +353,25 @@ public class ProductControllerTest {
                                 hasEntry("defaultMessage", "0以上の数値を指定してください")))));
     }
 
-    @Test
+    @Test // NotResourceFoundException
     void put_badUri_404_notFound() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
         String requestDtoJson = objectMapper.writeValueAsString(requestDto);
 
-        mockMvc.perform(put("/product/{id}", "1")
+        mockMvc.perform(put("/not-exists-path/{id}", "1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestDtoJson))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").value("No static resource product/1."))
+                .andExpect(jsonPath("$.detail").value("No static resource not-exists-path/1."))
                 .andExpect(jsonPath("$.type").value("about:blank"))
-                .andExpect(jsonPath("$.instance").value("/product/1"))
+                .andExpect(jsonPath("$.instance").value("/not-exists-path/1"))
                 .andExpect(jsonPath("$.title").value("Not Found"));
     }
 
-    @Test
+    @Test // ResourceNotFoundException
     void put_resourceNotFound_404_notFound() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
         String requestDtoJson = objectMapper.writeValueAsString(requestDto);
@@ -392,7 +392,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Not Found"));
     }
 
-    @Test
+    @Test // HttpRequestNotSupportedException
     void put_findAll_405_methodNotAllowed() throws Exception {
         mockMvc.perform(put("/products"))
                 .andDo(print())
@@ -404,7 +404,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Method Not Allowed"));
     }
 
-    @Test
+    @Test // DataIntegrityViolationException
     void put_save_409_conflict() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("Conflict Product", BigDecimal.valueOf(1000), 10);
         String requestDtoJson = objectMapper.writeValueAsString(requestDto);
@@ -429,7 +429,7 @@ public class ProductControllerTest {
                         allOf(hasEntry("errorMessage", "同じ商品名は登録できません")))));
     }
 
-    @Test
+    @Test // Other Exception
     void put_save_500_internalServerError() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
         when(service.updateProduct(eq(1L), any(ProductRequestDto.class)))
@@ -460,7 +460,7 @@ public class ProductControllerTest {
                 .andExpect(content().string(""));
     }
 
-    @Test
+    @Test // MethodArgumentTypeMismatchException
     void delete_badPathParam_400_badRequest() throws Exception {
         mockMvc.perform(delete("/products/{id}", "abc"))
                 .andDo(print())
@@ -474,7 +474,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Bad Request"));
     }
 
-    @Test
+    @Test // NotResourceFoundException
     void delete_badUri_400_badRequest() throws Exception {
         mockMvc.perform(delete("/bad-products"))
                 .andDo(print())
@@ -487,7 +487,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Not Found"));
     }
 
-    @Test
+    @Test // ResourceNotFoundException
     void delete_resourceNotFound_404_notFound() throws Exception {
         when(service.deleteProduct(999L)).thenReturn(false);
 
@@ -502,7 +502,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Not Found"));
     }
 
-    @Test
+    @Test // HttpRequestMethodNotSupportedException
     void delete_findAll_405_methodNotAllowed() throws Exception {
         mockMvc.perform(delete("/products"))
                 .andDo(print())
@@ -515,7 +515,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Method Not Allowed"));
     }
 
-    @Test
+    @Test // Other Exception
     void delete_interNalServerError_500() throws Exception {
         when(service.deleteProduct(1L)).thenThrow(new RuntimeException("予期せぬエラーが発生しました"));
 
