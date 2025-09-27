@@ -242,6 +242,31 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.title").value("Method Not Allowed"));
     }
 
+    @Test // DataIntegrityViolationException
+    void post_save_409_conflict() throws Exception {
+        ProductRequestDto requestDto = new ProductRequestDto("Conflict Product", BigDecimal.valueOf(1000), 10);
+        String requestDtoJson = objectMapper.writeValueAsString(requestDto);
+
+        when(service.createProduct(requestDto))
+                .thenThrow(new DataIntegrityViolationException("Unique index or primary key violation"));
+
+        mockMvc.perform(post("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestDtoJson))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.detail").value(
+                        "org.springframework.dao.DataIntegrityViolationException: Unique index or primary key violation"))
+                .andExpect(jsonPath("$.type").value("about:blank"))
+                .andExpect(jsonPath("$.instance").value("/products"))
+                .andExpect(jsonPath("$.title").value("Conflict"))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors", containsInAnyOrder(
+                        allOf(hasEntry("errorMessage", "同じ商品名は登録できません")))));
+    }
+
     @Test // Other Exception
     void post_save_500_internalServerError() throws Exception {
         ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 1000);
