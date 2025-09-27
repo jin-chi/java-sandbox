@@ -358,16 +358,16 @@ public class ProductControllerTest {
         ProductRequestDto requestDto = new ProductRequestDto("test product", BigDecimal.valueOf(1000), 10);
         String requestDtoJson = objectMapper.writeValueAsString(requestDto);
 
-        mockMvc.perform(put("/not-exists-path/{id}", "1")
+        mockMvc.perform(put("/not-exists-uri/{id}", "1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestDtoJson))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").value("No static resource not-exists-path/1."))
+                .andExpect(jsonPath("$.detail").value("No static resource not-exists-uri/1."))
                 .andExpect(jsonPath("$.type").value("about:blank"))
-                .andExpect(jsonPath("$.instance").value("/not-exists-path/1"))
+                .andExpect(jsonPath("$.instance").value("/not-exists-uri/1"))
                 .andExpect(jsonPath("$.title").value("Not Found"));
     }
 
@@ -476,14 +476,14 @@ public class ProductControllerTest {
 
     @Test // NotResourceFoundException
     void delete_badUri_400_badRequest() throws Exception {
-        mockMvc.perform(delete("/bad-products"))
+        mockMvc.perform(delete("/not-exists-uri"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").value("No static resource bad-products."))
+                .andExpect(jsonPath("$.detail").value("No static resource not-exists-uri."))
                 .andExpect(jsonPath("$.type").value("about:blank"))
-                .andExpect(jsonPath("$.instance").value("/bad-products"))
+                .andExpect(jsonPath("$.instance").value("/not-exists-uri"))
                 .andExpect(jsonPath("$.title").value("Not Found"));
     }
 
