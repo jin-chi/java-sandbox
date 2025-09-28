@@ -3,6 +3,8 @@ package com.example.productsbasic.controller;
 import java.net.URI;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +30,8 @@ import jakarta.validation.Valid;
 @RequestMapping("/products")
 public class ProductController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
     private ProductService service;
     private ProductMapper mapper;
 
@@ -38,16 +42,19 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<ProductGetResponseDto>> getAllProducts() {
+        logger.info("商品情報の全件取得処理を開始します。");
         return ResponseEntity.ok(service.getAllProducts());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductGetResponseDto> getProductById(@PathVariable Long id) {
+        logger.info("商品情報の取得処理を開始します。id: " + id );
         return ResponseEntity.ok(service.getProductById(id));
     }
 
     @PostMapping
     public ResponseEntity<ProductCreateUpdateResponseDto> createProduct(@Valid @RequestBody ProductRequestDto req) {
+        logger.info("商品登録処理を開始します。" + req);
         Product createdProduct = service.createProduct(req);
         ProductCreateUpdateResponseDto responseDto = mapper.toCreateUpdateResponseDto(createdProduct);
         URI location = ServletUriComponentsBuilder
@@ -61,11 +68,13 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductCreateUpdateResponseDto> updateProduct(@Valid @PathVariable Long id,
             @Valid @RequestBody ProductRequestDto req) {
+        logger.info("商品情報の更新処理を開始します。" + req);
         return ResponseEntity.ok(service.updateProduct(id, req));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@Valid @PathVariable Long id) {
+        logger.info("商品情報の削除処理を開始します。id: " + id);
         if (service.deleteProduct(id)) {
             return ResponseEntity.noContent().build();
         }
