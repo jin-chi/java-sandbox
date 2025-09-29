@@ -31,7 +31,7 @@ public class ProductService {
 
     public ProductGetResponseDto getProductById(Long id) {
         Product product = repo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ユーザーID " + id + " が存在しません"));
+                .orElseThrow(() -> new ResourceNotFoundException("IDが存在しません [id: " + id + "]"));
         return mapper.toGetResponseDto(product);
     }
 
@@ -41,7 +41,7 @@ public class ProductService {
 
     public ProductCreateUpdateResponseDto updateProduct(Long id, ProductRequestDto req) {
         Product product = repo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ユーザーID: " + id + " が存在しません"));
+                .orElseThrow(() -> new ResourceNotFoundException("IDが存在しません [id: " + id + "]"));
         product.setName(req.name());
         product.setPrice(req.price());
         product.setStock(req.stock());
