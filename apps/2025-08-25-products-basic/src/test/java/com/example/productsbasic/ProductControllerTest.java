@@ -552,7 +552,7 @@ public class ProductControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").value("ユーザーID: 999 が存在しません"))
+                .andExpect(jsonPath("$.detail").value("IDが存在しません [id: 999]"))
                 .andExpect(jsonPath("$.type").value("about:blank"))
                 .andExpect(jsonPath("$.instance").value("/products/999"))
                 .andExpect(jsonPath("$.title").value("Not Found"));
