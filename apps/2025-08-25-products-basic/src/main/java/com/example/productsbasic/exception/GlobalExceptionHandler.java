@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // RequestBody バリデーションエラー (400)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -41,6 +45,8 @@ public class GlobalExceptionHandler {
                 URI.create("about:blank"),
                 URI.create(request.getDescription(false).substring(4)));
         problemDetail.setErrors(errors);
+
+        logger.warn("errMsg={}, resDetail={}", ex, problemDetail);
 
         return ResponseEntity.badRequest().body(problemDetail);
     }
@@ -65,6 +71,8 @@ public class GlobalExceptionHandler {
                 URI.create(request.getDescription(false).substring(4)));
         problemDetail.setErrors(errors);
 
+        logger.warn("errMsg={}, resDetail={}", ex, problemDetail);
+
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
@@ -78,6 +86,8 @@ public class GlobalExceptionHandler {
                 detail,
                 URI.create("about:blank"),
                 URI.create(request.getDescription(false).substring(4)));
+
+        logger.warn("errMsg={}, resDetail={}", ex, problemDetail);
 
         return ResponseEntity.badRequest().body(problemDetail);
     }
@@ -93,6 +103,8 @@ public class GlobalExceptionHandler {
                 URI.create("about:blank"),
                 URI.create(request.getDescription(false).substring(4)));
 
+        logger.warn("errMsg={}, resDetail={}", ex, problemDetail);
+
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
@@ -106,6 +118,8 @@ public class GlobalExceptionHandler {
                 detail,
                 URI.create("about:blank"),
                 URI.create(request.getDescription(false).substring(4)));
+
+        logger.warn("errMsg={}, resDetail={}", ex, problemDetail);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
@@ -121,6 +135,8 @@ public class GlobalExceptionHandler {
                 URI.create("about:blank"),
                 URI.create(request.getDescription(false).substring(4)));
 
+        logger.warn("errMsg={}, resDetail={}", ex, problemDetail);
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
@@ -134,6 +150,8 @@ public class GlobalExceptionHandler {
                 detail,
                 URI.create("about:blank"),
                 URI.create(request.getDescription(false).substring(4)));
+
+        logger.warn("errMsg={}, resDetail={}", ex, problemDetail);
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(problemDetail);
     }
@@ -156,6 +174,8 @@ public class GlobalExceptionHandler {
             problemDetail.setErrors(errorDetails);
         }
 
+        logger.warn("errMsg={}, resDetail={}", ex, problemDetail);
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
     }
 
@@ -170,6 +190,8 @@ public class GlobalExceptionHandler {
                 URI.create(request.getDescription(false).substring(4)));
 
         problemDetail.setProperty("exceptionName", ex.getClass());
+
+        logger.error("errMsg={}, resDetail={}", ex, problemDetail);
 
         return ResponseEntity.internalServerError().body(problemDetail);
     }
