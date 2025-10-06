@@ -42,8 +42,7 @@ public class LoggingAspect {
             if (throwable == null) {
                 logger.info("[処理終了]: status=ok, class={}, method={}, processTime={}", className, methodName, duration);
             } else {
-                logger.error("[処理終了]: status=error, class={}, method={}, exType={}, msg={}, processTime={}", className,
-                        methodName, throwable.getClass().getSimpleName(), throwable.getMessage(), duration);
+                logger.info("[処理終了]: status=ng, class={}, method={}, processTime={}", className, methodName, duration);
             }
         }
     }
