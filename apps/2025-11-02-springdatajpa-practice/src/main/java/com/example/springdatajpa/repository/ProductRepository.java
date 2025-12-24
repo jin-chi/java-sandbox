@@ -13,10 +13,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByPriceBetweenOrderByPriceAsc(Long min, Long max);
 
     // 指定したカテゴリーに属し、かつ在庫が一定数以上のものを取得
-    List<Product> findByCategoryInAndStockQuantityGreaterThan(List<String> categories);
+    List<Product> findByCategoryInAndStockQuantityGreaterThan(List<String> categories, Integer quantity);
 
     // 【部分一致・大文字小文字を区別しない】
-    // 用途：検索バーでの商品名検索。ユーザーが「pc」と打っても「高性能ノートPC」がヒットするように
     List<Product> findByNameContainingIgnoreCase(String name);
 
     // 【存在確認 + 複数条件】
@@ -26,7 +25,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     // 【カウント + 条件】
     // 用途：在庫が閾値を下回っている「欠品間近」の商品の数を取得（ダッシュボード用）。
-    long countByStockQuantityLessThann(Integer threshold);
+    long countByStockQuantityLessThan(Integer threshold);
 
     // 【Top N 件の取得】
     // 用途：特定のカテゴリ内で「最も高い商品」を1つだけ取得してバナーに表示する。

@@ -3,16 +3,16 @@ package com.example.springdatajpa.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.example.springdatajpa.entity.base.BaseAuditEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(
@@ -22,14 +22,10 @@ import lombok.Setter;
     }
 )
 @Getter
-@Setter
-@NoArgsConstructor
-public class Coupon {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Coupon extends BaseAuditEntity {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "coupon_code", nullable = false, length = 20)
     private String couponCode;
 
@@ -40,16 +36,34 @@ public class Coupon {
     private LocalDate expiryDate;
 
     @Column(name = "used_at", nullable = true)
-    private LocalDateTime useAt;
+    private LocalDateTime usedAt;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    public Coupon(String couponCode, Integer discountRate, LocalDate expiryDate, boolean isActive) {
-        this.couponCode = couponCode;
-        this.discountRate = discountRate;
-        this.expiryDate = expiryDate;
-        this.isActive = isActive;
-        this.useAt = null; // 初期値は未使用
+    /**
+     * クーポンを使用済みにする
+     * @param useDate 使用日時
+     */
+    public void use(LocalDateTime useDate) {
+        if (!this.isActive) {
+            throw new IllegalStateException("無効なクーポンは使用できません");
+        }
+        if (this.usedAt != null) {
+            throw new IllegalStateException("既に使用済みのクーポンです");
+        }
+        if (useDate.toLocalDate().isAfter(this.expiryDate)) {
+            throw new IllegalStateException("期限切れのクーポンです");
+        }
+
+        this.usedAt = useDate;
+        // 使用したら無効にする用件であれば isActive = false; をここに入れる
+    }
+
+    /**
+     * クーポンを無効化する（管理画面などから操作）
+     */
+    public void deactivate() {
+        this.isActive = false;
     }
 }
