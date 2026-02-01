@@ -26,18 +26,21 @@ INSERT INTO product_review (customer_id, product_name, rating, content, review_d
 
 
 -- Product (商品) データ
-INSERT INTO product (id, product_code, name, price, category, stock_quantity) VALUES
-(1, 'P001', '高性能ノートPC', 150000, '家電', 5),
-(2, 'P002', 'ワイヤレスマウス', 3500, '家電', 50),
-(3, 'P003', 'オーガニックリンゴ', 200, '食品', 100),
-(4, 'P004', '高級オリーブオイル', 3000, '食品', 10),
-(5, 'P005', 'コットンTシャツ', 2500, '衣類', 30),
-(6, 'P006', '4Kテレビ', 80000, '家電', 0); -- 在庫切れケース
+-- BaseAuditEntityの導入により、created_at, updated_at が必須になります
+INSERT INTO product (id, product_code, name, price, category, stock_quantity, created_at, updated_at) VALUES
+(1, 'P001', '高性能ノートPC', 150000, '家電', 5, '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+(2, 'P002', 'ワイヤレスマウス', 3500, '家電', 50, '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+(3, 'P003', 'オーガニックリンゴ', 200, '食品', 100, '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+(4, 'P004', '高級オリーブオイル', 3000, '食品', 10, '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+(5, 'P005', 'コットンTシャツ', 2500, '衣類', 30, '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+(6, 'P006', '4Kテレビ', 80000, '家電', 0, '2025-01-01 10:00:00', '2025-01-01 10:00:00'); -- 在庫切れケース
 
 -- Coupon (クーポン) データ
-INSERT INTO coupon (id, coupon_code, discount_rate, expiry_date, used_at, is_active) VALUES
-(1, 'WELCOME10', 10, '2025-12-31', NULL, true), -- 有効・未使用
-(2, 'WINTER20', 20, '2025-12-25', NULL, true), -- 有効・未使用
-(3, 'OLD_SALE', 50, '2024-01-01', NULL, true), -- 期限切れ（過去日付）
-(4, 'USED_500', 5, '2026-01-01', '2025-12-01 10:00:00', true), -- 使用済み（used_at IS NOT NULL）
-(5, 'STOP_100', 15, '2026-12-31', NULL, false); -- 無効設定（is_active = false）
+-- used_at カラム名に対応
+-- is_active はDBによっては 1/0 ですが、H2などのテスト環境では true/false で通ります
+INSERT INTO coupon (id, coupon_code, discount_rate, expiry_date, used_at, is_active, created_at, updated_at) VALUES
+(1, 'WELCOME10', 10, '2025-12-31', NULL, true, '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+(2, 'WINTER20', 20, '2025-12-25', NULL, true, '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+(3, 'OLD_SALE', 50, '2024-01-01', NULL, true, '2025-01-01 10:00:00', '2025-01-01 10:00:00'), -- 期限切れ
+(4, 'USED_500', 5, '2026-01-01', '2025-12-01 10:00:00', true, '2025-01-01 10:00:00', '2025-01-01 10:00:00'), -- 使用済み
+(5, 'STOP_100', 15, '2026-12-31', NULL, false, '2025-01-01 10:00:00', '2025-01-01 10:00:00'); -- 無効化済み
