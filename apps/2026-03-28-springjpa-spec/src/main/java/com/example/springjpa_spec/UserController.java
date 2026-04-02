@@ -19,7 +19,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getName(@RequestParam String name, @RequestParam Integer age) {
+    public ResponseEntity<List<User>> getName(@RequestParam(required = false) String name, @RequestParam(required = false) Integer age) {
         return ResponseEntity.ok(service.search(name, age));
     }
 }
