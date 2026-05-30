@@ -8,20 +8,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    UserRepository userRepo;
+    // UserRepositoryヲDIする
+    private UserRepository userRepository;
 
-    public UserService(UserRepository repo) {
-        this.userRepo = repo;
-    }
-
+    // name, ageを条件にUserを検索して返す
+    // 両方nullの場合は空リストを返す
     public List<User> search(String name, Integer age) {
-        if (name == null && age == null) {
-            return List.of();
-        }
+        if ((name == null || name.isEmpty()) && age == null) return null;
+
         Specification<User> spec = Specification
-                                .where(UserSpecifications.hasName(name)
-                                .and(UserSpecifications.hasAge(age)));
-                                
-        return userRepo.findAll(spec);
+                                        .where(UserSpecifications.hasName(name))
+                                        .and(UserSpecifications.hasAge(age));
+        return userRepository.findAll(spec);
     }
 }
