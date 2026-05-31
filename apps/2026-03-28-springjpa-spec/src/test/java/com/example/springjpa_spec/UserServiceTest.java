@@ -1,5 +1,6 @@
 package com.example.springjpa_spec;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -26,7 +27,7 @@ class UserServiceTest {
     void search_returnsEmptyList_whenBothParamsAreNull() {
         List<User> result = userService.search(null, null);
 
-        result.isEmpty();
+        assertThat(result).isEmpty();
         verify(userRepo, never()).findAll(ArgumentMatchers.<Specification<User>>any());
     }
 
