@@ -3,12 +3,12 @@ package com.example.springjpa_spec;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/users")
 public class UserController {
 
@@ -20,6 +20,6 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getUsers(@RequestParam(required = false) String name, @RequestParam(required = false) Integer age) {
-        return ResponseEntity.ok(userService.getUsers(name, age));
+        return ResponseEntity.ok(userService.search(name, age));
     }
 }

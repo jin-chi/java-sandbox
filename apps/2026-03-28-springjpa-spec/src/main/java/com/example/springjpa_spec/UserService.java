@@ -14,7 +14,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getUsers(String name, Integer age) {
+    public List<User> search(String name, Integer age) {
         if ((name == null || name.isEmpty()) && age == null) return List.of();
         Specification<User> spec = Specification
                                         .where(UserSpecifications.hasName(name))
