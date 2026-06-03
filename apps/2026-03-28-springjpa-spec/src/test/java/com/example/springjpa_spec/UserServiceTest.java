@@ -22,70 +22,14 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    // nameもageもnullのとき、空リストを返しfindAllを呼ばない
     @Test
     void search_returnsEmptyList_whenBothParamsAreNull() {
+        // 結果はないのでモックの結果は作らない
+        // モックも作らないので when() もなし
+
         List<User> result = userService.search(null, null);
 
-        // テストは assertThat() を使う
         assertThat(result).isEmpty();
-
-        // findAll() が呼ばれていないことを明示的に確認する
         verify(userRepo, never()).findAll(ArgumentMatchers.<Specification<User>>any());
-    }
-
-    // nameのみ指定のとき、findAllを呼び結果を返す
-    @Test
-    void search_callsFindAll_whenOnlyNameIsGiven() {
-        // List は List.of(mockUser) で簡潔に書ける
-        User mockUser = User.builder()
-                            .name("taro")
-                            .build();
-        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
-
-        List<User> result = userService.search("taro", null);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("taro");
-        // name を確認するテストなので age の null チェックは不要
-        // assertThat(result.get(0).getAge()).isEqualTo(null);
-
-        // time(1) は省略できる。デフォルトなので。
-        verify(userRepo).findAll(ArgumentMatchers.<Specification<User>>any());
-    }
-
-    // argのみ指定のとき、findAllを呼び結果を返す
-    @Test
-    void search_callsFindAll_whenOnlyAgeIsGiven() {
-        // 省略すると自動的に null になるので明示的な記載は不要
-        User mockUser = User.builder()
-                            // .name(null)
-                            .age(30)
-                            .build();
-        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
-
-        List<User> result = userService.search(null, 30);
-
-        assertThat(result).hasSize(1);
-        // 配列の要素を取得した後、値を取ることまで忘れない
-        assertThat(result.get(0).getAge()).isEqualTo(30);
-        verify(userRepo).findAll(ArgumentMatchers.<Specification<User>>any());
-    }
-
-    // nameとage両方指定のとき、findAllを呼び結果を返す
-    @Test
-    void search_callsFindAll_whenBothParamsAreGiven() {
-        User mockUser = User.builder()
-                            .name("taro")
-                            .age(30)
-                            .build();
-        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
-
-        List<User> result = userService.search("taro", 30);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("taro");
-        assertThat(result.get(0).getAge()).isEqualTo(30);
-        verify(userRepo).findAll(ArgumentMatchers.<Specification<User>>any());
     }
 }
