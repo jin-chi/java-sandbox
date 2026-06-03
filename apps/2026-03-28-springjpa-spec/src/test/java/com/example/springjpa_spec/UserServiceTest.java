@@ -57,7 +57,19 @@ class UserServiceTest {
     // argのみ指定のとき、findAllを呼び結果を返す
     @Test
     void search_callsFindAll_whenOnlyAgeIsGiven() {
+        // 省略すると自動的に null になるので明示的な記載は不要
+        User mockUser = User.builder()
+                            // .name(null)
+                            .age(30)
+                            .build();
+        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
 
+        List<User> result = userService.search(null, 30);
+
+        assertThat(result).hasSize(1);
+        // 配列の要素を取得した後、値を取ることまで忘れない
+        assertThat(result.get(0).getAge()).isEqualTo(30);
+        verify(userRepo).findAll(ArgumentMatchers.<Specification<User>>any());
     }
 
     // nameとage両方指定のとき、findAllを呼び結果を返す
