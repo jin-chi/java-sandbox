@@ -32,4 +32,48 @@ class UserServiceTest {
         assertThat(result).isEmpty();
         verify(userRepo, never()).findAll(ArgumentMatchers.<Specification<User>>any());
     }
+
+    @Test
+    void search_callsFindAll_whenOnlyNameIsGiven() {
+        User mockUser = User.builder()
+                            .name("taro")
+                            .build();
+        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
+
+        List<User> result = userService.search("taro", null);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("taro");
+        verify(userRepo).findAll(ArgumentMatchers.<Specification<User>>any());
+    }
+
+    @Test
+    void search_callsFindAll_whenOnlyAgeIsGiven() {
+        User mockUser = User.builder()
+                            .age(30)
+                            .build();
+        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
+
+        List<User> result = userService.search(null, 30);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getAge()).isEqualTo(30);
+        verify(userRepo).findAll(ArgumentMatchers.<Specification<User>>any());
+    }
+
+    @Test
+    void search_callsFindAll_whenBothParamsAreGiven() {
+        User mockUser = User.builder()
+                            .name("taro")
+                            .age(30)
+                            .build();
+        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
+
+        List<User> result = userService.search("taro", 30);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo("taro");
+        assertThat(result.get(0).getAge()).isEqualTo(30);
+        verify(userRepo).findAll(ArgumentMatchers.<Specification<User>>any());
+    }
 }
