@@ -3,7 +3,6 @@ package com.example.springjpa_spec;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -28,26 +27,31 @@ class UserServiceTest {
     void search_returnsEmptyList_whenBothParamsAreNull() {
         List<User> result = userService.search(null, null);
 
+        // テストは assertThat() を使う
         assertThat(result).isEmpty();
+
+        // findAll() が呼ばれていないことを明示的に確認する
         verify(userRepo, never()).findAll(ArgumentMatchers.<Specification<User>>any());
     }
 
     // nameのみ指定のとき、findAllを呼び結果を返す
     @Test
     void search_callsFindAll_whenOnlyNameIsGiven() {
-        List<User> users = new ArrayList<>();
+        // List は List.of(mockUser) で簡潔に書ける
         User mockUser = User.builder()
                             .name("taro")
                             .build();
-        users.add(mockUser);
-        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(users);
+        when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
 
         List<User> result = userService.search("taro", null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("taro");
-        assertThat(result.get(0).getAge()).isEqualTo(null);
-        verify(userRepo, times(1)).findAll(ArgumentMatchers.<Specification<User>>any());
+        // name を確認するテストなので age の null チェックは不要
+        // assertThat(result.get(0).getAge()).isEqualTo(null);
+
+        // time(1) は省略できる。デフォルトなので。
+        verify(userRepo).findAll(ArgumentMatchers.<Specification<User>>any());
     }
 
     // argのみ指定のとき、findAllを呼び結果を返す
