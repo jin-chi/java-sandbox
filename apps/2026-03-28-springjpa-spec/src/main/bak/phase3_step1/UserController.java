@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 public class UserController {
 
-    UserService userService;
+    private UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -21,7 +21,6 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> getUsers(@RequestParam(required = false) String name,
             @RequestParam(required = false) Integer age) {
-
         return ResponseEntity.ok(userService.search(name, age));
     }
 }
