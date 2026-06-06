@@ -16,7 +16,8 @@ public class UserService {
     }
 
     public List<UserResponseDto> search(String name, Integer age) {
-        if ((name == null || name.isEmpty()) && age == null) return List.of();
+        if ((name == null || name.isEmpty()) && age == null)
+            return List.of();
 
         Specification<User> spec = Specification
                 .where(UserSpecifications.hasName(name))
