@@ -19,7 +19,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getUsers(@RequestParam(required = false) String name, @RequestParam(required = false) Integer age) {
+    public ResponseEntity<List<UserResponseDto>> getUsers(@RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer age) {
         return ResponseEntity.ok(userService.search(name, age));
     }
 }
