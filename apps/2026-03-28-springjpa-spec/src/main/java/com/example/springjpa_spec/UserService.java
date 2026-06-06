@@ -15,7 +15,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<UserResponseDto> serach(String name, Integer age) {
+    public List<UserResponseDto> search(String name, Integer age) {
         if ((name == null || name.isEmpty()) && age == null) return List.of();
 
         Specification<User> spec = Specification
