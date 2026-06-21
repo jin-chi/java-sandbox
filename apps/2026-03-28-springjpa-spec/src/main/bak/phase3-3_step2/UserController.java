@@ -20,7 +20,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> getUsers(@ModelAttribute @Validated UserSearchReqeust userSearchReqeust) {
-        return ResponseEntity.ok().body(userService.search(userSearchReqeust.getName(), userSearchReqeust.getAge()));
+    public ResponseEntity<List<UserResponseDto>> getUsers(@ModelAttribute @Validated UserSearchRequest request) {
+        return ResponseEntity.ok(userService.search(request.getName(), request.getAge()));
     }
 }
