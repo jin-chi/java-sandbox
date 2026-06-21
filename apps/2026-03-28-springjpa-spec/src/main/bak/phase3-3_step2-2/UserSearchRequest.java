@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class UserSearchRequest {
 
-    @Size(min = 1, max = 50, message = "1文字以上、50文字以内で指定してください")
+    @Size(min = 1, max = 50, message = "1文字以上、50文字以下で指定してください")
     private String name;
 
     @Min(0)
