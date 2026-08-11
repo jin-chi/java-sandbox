@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Service
 public class UserService {
@@ -16,15 +15,10 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<UserResponseDto> search(String name, Integer age, String email, String keyword) {
-        if (!StringUtils.hasText(name) && !StringUtils.hasText(email) && age == null && !StringUtils.hasText(keyword))
-            return List.of();
+    public List<UserResponseDto> search(String name, Integer age) {
+        if ((name == null || name.isEmpty()) && age == null) return List.of();
 
-        Specification<User> spec = UserSpecifications.nameContains(name)
-                .and(UserSpecifications.emailContains(email))
-                .and(UserSpecifications.ageEquals(age))
-                .and(UserSpecifications.keywordContains(keyword));
-
+        Specification<User> spec = UserSpecifications.search(name, age);
         List<UserResponseDto> result = userRepository.findAll(spec).stream()
                 .map(UserResponseDto::from)
                 .collect(Collectors.toList());

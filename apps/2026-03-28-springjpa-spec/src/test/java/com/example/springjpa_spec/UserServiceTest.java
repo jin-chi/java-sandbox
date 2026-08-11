@@ -27,7 +27,7 @@ class UserServiceTest {
         // 結果はないのでモックの結果は作らない
         // モックも作らないので when() もなし
 
-        List<UserResponseDto> result = userService.search(null, null);
+        List<UserResponseDto> result = userService.search(null, null, null, null);
 
         assertThat(result).isEmpty();
         verify(userRepo, never()).findAll(ArgumentMatchers.<Specification<User>>any());
@@ -40,7 +40,7 @@ class UserServiceTest {
                             .build();
         when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
 
-        List<UserResponseDto> result = userService.search("taro", null);
+        List<UserResponseDto> result = userService.search("taro", null, null, null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("taro");
@@ -54,7 +54,7 @@ class UserServiceTest {
                             .build();
         when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
 
-        List<UserResponseDto> result = userService.search(null, 30);
+        List<UserResponseDto> result = userService.search(null, 30, null, null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getAge()).isEqualTo(30);
@@ -69,7 +69,7 @@ class UserServiceTest {
                             .build();
         when(userRepo.findAll(ArgumentMatchers.<Specification<User>>any())).thenReturn(List.of(mockUser));
 
-        List<UserResponseDto> result = userService.search("taro", 30);
+        List<UserResponseDto> result = userService.search("taro", 30, null, null);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("taro");

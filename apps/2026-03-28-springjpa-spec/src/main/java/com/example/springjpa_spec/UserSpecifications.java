@@ -1,15 +1,32 @@
 package com.example.springjpa_spec;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 public class UserSpecifications {
 
-    public static Specification<User> hasName(String name) {
-        return (root, query, criteriaBuilder) -> (name == null || name.isEmpty()) ? criteriaBuilder.conjunction()
-                : criteriaBuilder.equal(root.get("name"), name);
+    public static Specification<User> nameContains(String name) {
+        return (root, query, cb) -> StringUtils.hasText(name) ? cb.like(root.get("name"), "%" + name + "%")
+                : cb.conjunction();
     }
 
-    public static Specification<User> hasAge(Integer age) {
-        return (root, query, criteriaBuild) -> age == null ? criteriaBuild.conjunction() : criteriaBuild.equal(root.get("age"), age);
+    public static Specification<User> emailContains(String email) {
+        return (root, query, cb) -> StringUtils.hasText(email) ? cb.like(root.get("email"), "%" + email + "%")
+                : cb.conjunction();
+    }
+
+    public static Specification<User> ageEquals(Integer age) {
+        return (root, query, cb) -> age != null ? cb.equal(root.get("age"), age) : cb.conjunction();
+    }
+
+    public static Specification<User> keywordContains(String keyword) {
+        return (root, query, cb) -> {
+            if (!StringUtils.hasText(keyword))
+                return cb.conjunction();
+            String kw = "%" + keyword + "%";
+            return cb.or(
+                    cb.like(root.get("name"), kw),
+                    cb.like(root.get("email"), kw));
+        };
     }
 }

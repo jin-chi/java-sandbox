@@ -16,14 +16,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<UserResponseDto> search(String name, Integer age, String email, String keyword) {
-        if (!StringUtils.hasText(name) && !StringUtils.hasText(email) && age == null && !StringUtils.hasText(keyword))
+    public List<UserResponseDto> search(String name, Integer age) {
+        if (!StringUtils.hasText(name) && age == null)
             return List.of();
 
         Specification<User> spec = UserSpecifications.nameContains(name)
-                .and(UserSpecifications.emailContains(email))
-                .and(UserSpecifications.ageEquals(age))
-                .and(UserSpecifications.keywordContains(keyword));
+                .and(UserSpecifications.ageEquals(age));
 
         List<UserResponseDto> result = userRepository.findAll(spec).stream()
                 .map(UserResponseDto::from)
