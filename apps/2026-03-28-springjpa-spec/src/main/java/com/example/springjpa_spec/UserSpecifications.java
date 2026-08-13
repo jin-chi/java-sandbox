@@ -29,4 +29,13 @@ public class UserSpecifications {
                     cb.like(root.get("email"), kw));
         };
     }
+
+    public static Specification<User> ageFrom(Integer ageFrom) {
+        return (root, query, cb) -> ageFrom != null ? cb.greaterThanOrEqualTo(root.get("age"), ageFrom)
+                : cb.conjunction();
+    }
+
+    public static Specification<User> ageTo(Integer ageTo) {
+        return (root, query, cb) -> ageTo != null ? cb.lessThanOrEqualTo(root.get("age"), ageTo) : cb.conjunction();
+    }
 }
