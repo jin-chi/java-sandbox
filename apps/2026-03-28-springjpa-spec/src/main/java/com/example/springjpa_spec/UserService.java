@@ -16,7 +16,8 @@ public class UserService {
     }
 
     public List<UserResponseDto> search(UserSearchRequest req) {
-        if (req.isEmpty()) return List.of();
+        if (req.isEmpty())
+            return List.of();
 
         Specification<User> spec = UserSpecifications.nameContains(req.getName())
                 .and(UserSpecifications.emailContains(req.getEmail()))
