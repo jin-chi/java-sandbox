@@ -11,9 +11,9 @@ public record ProductRequestDto(
         String name,
         @Size(min = 1, max = 100, message = "1文字以上100文字以内で指定してください")
         String category,
-        @Min(value = 1, message = "1以上の値を指定してください")
+        @Min(value = 0, message = "0以上の値を指定してください")
         Integer priceFrom,
-        @Min(value = 1, message = "1以上の値を指定してください")
+        @Min(value = 0, message = "0以上の値を指定してください")
         Integer priceTo,
         Boolean inStock
     ) {

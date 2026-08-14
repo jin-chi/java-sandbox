@@ -30,7 +30,7 @@ public class ProductService {
                 .collect(Collectors.toList());
 
         if (result.isEmpty()) {
-            throw new ProductNotFoundException("404");
+            throw new ProductNotFoundException("Product not found");
         }
 
         return result;

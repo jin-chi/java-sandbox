@@ -8,7 +8,7 @@ public class ProductSpecifications {
     // 商品名の部分一致: nameContains(String)
     public static Specification<Product> nameContains(String name) {
         return (root, query, cb) -> {
-            if (StringUtils.hasText(name))
+            if (!StringUtils.hasText(name))
                 return cb.conjunction();
             String n = "%" + name + "%";
             return cb.like(root.get("name"), n);
