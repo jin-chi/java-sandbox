@@ -1,7 +1,6 @@
 package com.example.employee_search;
 
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,7 +20,7 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmployeeResponseDto>> getEmployees(@Valid @ModelAttribute EmployeeRequestDto req) {
-        return ResponseEntity.ok(employeeService.search(req));
+    public ResponseEntity<PageResponse<EmployeeResponseDto>> getEmployees(@Valid @ModelAttribute EmployeeRequestDto req, Pageable pageable) {
+        return ResponseEntity.ok(employeeService.search(req, pageable));
     }
 }

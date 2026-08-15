@@ -1,8 +1,7 @@
 package com.example.employee_search;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +14,9 @@ public class EmployeeService {
         this.employeeRepository = employeeRepository;
     }
 
-    public List<EmployeeResponseDto> search(EmployeeRequestDto req) {
+    public PageResponse<EmployeeResponseDto> search(EmployeeRequestDto req, Pageable pageable) {
         if (req.isEmpty())
-            return List.of();
+            return PageResponse.from(Page.empty(pageable));
 
         Specification<Employee> spec = EmployeeSpecifications.nameContains(req.getName())
                 .and(EmployeeSpecifications.departmentsIn(req.getDepartments()))
@@ -25,15 +24,12 @@ public class EmployeeService {
                 .and(EmployeeSpecifications.salaryTo(req.getSalaryTo()))
                 .and(EmployeeSpecifications.topLevelOnly(req.getTopLevelOnly()));
 
-        List<EmployeeResponseDto> result = employeeRepository.findAll(spec)
-                .stream()
-                .map(EmployeeResponseDto::from)
-                .collect(Collectors.toList());
+        Page<Employee> page = employeeRepository.findAll(spec, pageable);
 
-        if (result.isEmpty()) {
+        if (page.isEmpty()) {
             throw new EmployeeNotFoundException("Employee not found");
         }
 
-        return result;
+        return PageResponse.from(page.map(EmployeeResponseDto::from));
     }
 }
