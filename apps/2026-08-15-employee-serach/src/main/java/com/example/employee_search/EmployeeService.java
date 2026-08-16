@@ -23,7 +23,8 @@ public class EmployeeService {
                 .and(EmployeeSpecifications.salaryFrom(req.getSalaryFrom()))
                 .and(EmployeeSpecifications.salaryTo(req.getSalaryTo()))
                 .and(EmployeeSpecifications.topLevelOnly(req.getTopLevelOnly()))
-                .and(EmployeeSpecifications.fetchManager());
+                // .and(EmployeeSpecifications.fetchManager())
+                ;
 
         Page<Employee> page = employeeRepository.findAll(spec, pageable);
 
