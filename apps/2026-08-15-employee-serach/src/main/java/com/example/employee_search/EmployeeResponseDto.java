@@ -6,7 +6,8 @@ public record EmployeeResponseDto(
         String department,
         String position,
         Integer salary,
-        Long managerId
+        Long managerId,
+        String managerName
 ) {
         public static EmployeeResponseDto from(Employee employee) {
             return new EmployeeResponseDto(
@@ -15,7 +16,8 @@ public record EmployeeResponseDto(
                 employee.getDepartment(),
                 employee.getPosition(),
                 employee.getSalary(),
-                employee.getManagerId()
+                employee.getManager() != null ? employee.getManager().getId() : null,
+                employee.getManager() != null ? employee.getManager().getName() : null
             );
         }
 }
