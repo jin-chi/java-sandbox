@@ -3,6 +3,8 @@ package com.example.order_search;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,7 +33,9 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
     private Integer totalAmount;
     private LocalDateTime orderedAt;
 }

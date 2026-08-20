@@ -19,7 +19,7 @@ public class OrderSearchRequestDto {
     private String orderNumber;
 
     @Size(max = 4, message = "4つまで指定可能です")
-    private List<String> statuses;
+    private List<OrderStatus> statuses;
 
     @Min(value = 0, message = "0以上の値を指定してください")
     private Integer amountFrom;
@@ -33,7 +33,7 @@ public class OrderSearchRequestDto {
     @Size(min = 1, max = 100, message = "1文字以上100文字以下で指定してください")
     private String customerName;
 
-    private String customerRank;
+    private CustomerRank customerRank;
 
     public boolean isEmpty() {
         return !StringUtils.hasText(orderNumber)
@@ -42,7 +42,7 @@ public class OrderSearchRequestDto {
                 && amountTo == null
                 && orderedFrom == null
                 && orderedTo == null
-                && !StringUtils.hasText(customerName)
-                && !StringUtils.hasText(customerRank);
+                && customerName == null
+                && customerRank == null;
     }
 }

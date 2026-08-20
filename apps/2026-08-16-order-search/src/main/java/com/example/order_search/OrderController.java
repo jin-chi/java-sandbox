@@ -11,11 +11,11 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/orders")
-public class OrderControl {
+public class OrderController {
 
     private OrderService orderService;
 
-    public OrderControl(OrderService orderService) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 

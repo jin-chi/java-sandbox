@@ -18,7 +18,7 @@ public class OrderSpecifications {
         };
     }
 
-    public static Specification<Order> statusesIn(List<String> statuses) {
+    public static Specification<Order> statusesIn(List<OrderStatus> statuses) {
         return (root, query, cb) -> !CollectionUtils.isEmpty(statuses) ? root.get("status").in(statuses)
                 : cb.conjunction();
     }
@@ -52,8 +52,8 @@ public class OrderSpecifications {
         };
     }
 
-    public static Specification<Order> customerRankEquals(String customerRank) {
-        return (root, query, cb) -> StringUtils.hasText(customerRank)
+    public static Specification<Order> customerRankEquals(CustomerRank customerRank) {
+        return (root, query, cb) -> customerRank != null
                 ? cb.equal(root.get("customer").get("rank"), customerRank)
                 : cb.conjunction();
     }
