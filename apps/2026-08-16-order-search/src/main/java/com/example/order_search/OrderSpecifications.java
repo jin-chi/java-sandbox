@@ -34,12 +34,12 @@ public class OrderSpecifications {
     }
 
     public static Specification<Order> orderedFrom(LocalDate orderedFrom) {
-        return (root, query, cb) -> orderedFrom != null ? cb.greaterThanOrEqualTo(root.get("orderedAt"), orderedFrom)
+        return (root, query, cb) -> orderedFrom != null ? cb.greaterThanOrEqualTo(root.get("orderedAt"), orderedFrom.atStartOfDay())
                 : cb.conjunction();
     }
 
     public static Specification<Order> orderedTo(LocalDate orderedTo) {
-        return (root, query, cb) -> orderedTo != null ? cb.lessThan(root.get("orderedAt"), orderedTo.plusDays(1))
+        return (root, query, cb) -> orderedTo != null ? cb.lessThan(root.get("orderedAt"), orderedTo.plusDays(1).atStartOfDay())
                 : cb.conjunction();
     }
 

@@ -16,7 +16,7 @@ public class OrderService {
 
     public PageResponse<OrderResponseDto> search(OrderSearchRequestDto req, Pageable pageable) {
         if (req.isEmpty())
-            return PageResponse.from(Page.empty());
+            return PageResponse.from(Page.empty(pageable));
 
         Specification<Order> spec = OrderSpecifications.orderNumberContains(req.getOrderNumber())
                 .and(OrderSpecifications.statusesIn(req.getStatuses()))
