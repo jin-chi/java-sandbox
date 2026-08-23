@@ -1,9 +1,17 @@
-package com.example.order_search;
+package com.example.order_search.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import com.example.order_search.dto.OrderResponseDto;
+import com.example.order_search.dto.OrderSearchRequestDto;
+import com.example.order_search.dto.PageResponse;
+import com.example.order_search.entity.Order;
+import com.example.order_search.exception.OrderNotFoundException;
+import com.example.order_search.repository.OrderRepository;
+import com.example.order_search.repository.OrderSpecifications;
 
 @Service
 public class OrderService {

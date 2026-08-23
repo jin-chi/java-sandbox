@@ -1,4 +1,4 @@
-package com.example.order_search;
+package com.example.order_search.dto;
 
 import java.util.List;
 

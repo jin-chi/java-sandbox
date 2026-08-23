@@ -1,4 +1,4 @@
-package com.example.order_search;
+package com.example.order_search.repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -6,6 +6,10 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import com.example.order_search.entity.CustomerRank;
+import com.example.order_search.entity.Order;
+import com.example.order_search.entity.OrderStatus;
 
 public class OrderSpecifications {
 

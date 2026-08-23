@@ -1,6 +1,10 @@
-package com.example.order_search;
+package com.example.order_search.dto;
 
 import java.time.LocalDateTime;
+
+import com.example.order_search.entity.CustomerRank;
+import com.example.order_search.entity.Order;
+import com.example.order_search.entity.OrderStatus;
 
 public record OrderResponseDto(
         Long id,

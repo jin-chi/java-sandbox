@@ -1,4 +1,4 @@
-package com.example.order_search;
+package com.example.order_search.entity;
 
 import java.time.LocalDateTime;
 

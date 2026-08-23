@@ -1,4 +1,4 @@
-package com.example.order_search;
+package com.example.order_search.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

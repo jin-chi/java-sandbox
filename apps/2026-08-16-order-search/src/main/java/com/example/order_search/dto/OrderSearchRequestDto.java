@@ -1,10 +1,13 @@
-package com.example.order_search;
+package com.example.order_search.dto;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import com.example.order_search.entity.CustomerRank;
+import com.example.order_search.entity.OrderStatus;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
