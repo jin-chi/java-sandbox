@@ -54,7 +54,7 @@ public class OrderSpecifications {
             if (!StringUtils.hasText(customerName))
                 return cb.conjunction();
             String name = "%" + customerName + "%";
-            return cb.like(root.get("customer").get("name"), name);
+            return cb.like(root.join("customer", JoinType.LEFT).get("name"), name);
         };
     }
 
