@@ -11,6 +11,9 @@ import com.example.order_search.entity.CustomerRank;
 import com.example.order_search.entity.Order;
 import com.example.order_search.entity.OrderStatus;
 
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
+
 public class OrderSpecifications {
 
     public static Specification<Order> orderNumberContains(String orderNumber) {
@@ -38,12 +41,14 @@ public class OrderSpecifications {
     }
 
     public static Specification<Order> orderedFrom(LocalDate orderedFrom) {
-        return (root, query, cb) -> orderedFrom != null ? cb.greaterThanOrEqualTo(root.get("orderedAt"), orderedFrom.atStartOfDay())
+        return (root, query, cb) -> orderedFrom != null
+                ? cb.greaterThanOrEqualTo(root.get("orderedAt"), orderedFrom.atStartOfDay())
                 : cb.conjunction();
     }
 
     public static Specification<Order> orderedTo(LocalDate orderedTo) {
-        return (root, query, cb) -> orderedTo != null ? cb.lessThan(root.get("orderedAt"), orderedTo.plusDays(1).atStartOfDay())
+        return (root, query, cb) -> orderedTo != null
+                ? cb.lessThan(root.get("orderedAt"), orderedTo.plusDays(1).atStartOfDay())
                 : cb.conjunction();
     }
 
@@ -60,5 +65,30 @@ public class OrderSpecifications {
         return (root, query, cb) -> customerRank != null
                 ? cb.equal(root.get("customer").get("rank"), customerRank)
                 : cb.conjunction();
+    }
+
+    public static Specification<Order> keywordContains(String keyword) {
+        return (root, query, cb) -> {
+            if (!StringUtils.hasText(keyword))
+                return cb.conjunction();
+            String k = "%" + keyword + "%";
+            return cb.or(
+                    cb.like(root.get("orderNumber"), k),
+                    cb.like(root.get("customer").get("name"), k));
+        };
+    }
+
+    public static Specification<Order> hasPendingOrder(Boolean hasPendingOrder) {
+        return (root, query, cb) -> {
+            if (hasPendingOrder == null || !hasPendingOrder) return cb.conjunction();
+            Subquery<Integer> sub = query.subquery(Integer.class);
+            Root<Order> subRoot = sub.from(Order.class);
+            sub.select(cb.literal(1));
+            sub.where(
+                cb.equal(subRoot.get("customer"), root.get("customer")),
+                cb.equal(subRoot.get("status"), OrderStatus.PENDING)
+            );
+            return cb.exists(sub);
+        };
     }
 }

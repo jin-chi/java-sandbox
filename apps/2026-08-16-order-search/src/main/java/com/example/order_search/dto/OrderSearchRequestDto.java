@@ -38,6 +38,11 @@ public class OrderSearchRequestDto {
 
     private CustomerRank customerRank;
 
+    @Size(min = 1, max = 100, message = "1文字以上100文字以下で指定してください")
+    private String keyword;
+
+    private Boolean hasPendingOrder;
+
     public boolean isEmpty() {
         return !StringUtils.hasText(orderNumber)
                 && CollectionUtils.isEmpty(statuses)
@@ -46,6 +51,8 @@ public class OrderSearchRequestDto {
                 && orderedFrom == null
                 && orderedTo == null
                 && customerName == null
-                && customerRank == null;
+                && customerRank == null
+                && !StringUtils.hasText(keyword)
+                && (hasPendingOrder == null || !hasPendingOrder);
     }
 }

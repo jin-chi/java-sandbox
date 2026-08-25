@@ -33,7 +33,9 @@ public class OrderService {
                 .and(OrderSpecifications.orderedFrom(req.getOrderedFrom()))
                 .and(OrderSpecifications.orderedTo(req.getOrderedTo()))
                 .and(OrderSpecifications.customerNameContains(req.getCustomerName()))
-                .and(OrderSpecifications.customerRankEquals(req.getCustomerRank()));
+                .and(OrderSpecifications.customerRankEquals(req.getCustomerRank()))
+                .and(OrderSpecifications.keywordContains(req.getKeyword()))
+                .and((OrderSpecifications.hasPendingOrder(req.getHasPendingOrder())));
 
         Page<Order> page = orderRepository.findAll(spec, pageable);
 
