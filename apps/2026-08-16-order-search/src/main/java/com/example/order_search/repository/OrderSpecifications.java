@@ -11,6 +11,8 @@ import com.example.order_search.entity.CustomerRank;
 import com.example.order_search.entity.Order;
 import com.example.order_search.entity.OrderStatus;
 
+import jakarta.persistence.criteria.JoinType;
+
 public class OrderSpecifications {
 
     public static Specification<Order> orderNumberContains(String orderNumber) {
@@ -58,7 +60,7 @@ public class OrderSpecifications {
 
     public static Specification<Order> customerRankEquals(CustomerRank customerRank) {
         return (root, query, cb) -> customerRank != null
-                ? cb.equal(root.get("customer").get("rank"), customerRank)
+                ? cb.equal(root.join("customer", JoinType.LEFT).get("rank"), customerRank)
                 : cb.conjunction();
     }
 }
