@@ -23,10 +23,13 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "`rank`")
+    @Column(name = "`rank`", nullable = false)
     private CustomerRank rank;
 }
