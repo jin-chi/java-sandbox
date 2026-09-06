@@ -69,7 +69,7 @@ public class TransactionSpecifications {
         return (root, query, cb) -> {
             if (unreviewed == null || !unreviewed)
                 return cb.conjunction();
-            return cb.isNull(root.get("unreviewed"));
+            return cb.isNull(root.get("reviewedBy"));
         };
     }
 
