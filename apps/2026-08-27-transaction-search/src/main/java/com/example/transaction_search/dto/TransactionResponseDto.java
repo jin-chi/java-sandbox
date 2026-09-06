@@ -24,7 +24,7 @@ public record TransactionResponseDto(
                 transaction.getId(),
                 transaction.getTransactionRef(),
                 transaction.getType(),
-                transaction.getStauts(),
+                transaction.getStatus(),
                 transaction.getAmount(),
                 transaction.getExecutedAt(),
                 transaction.getReviewedBy(),

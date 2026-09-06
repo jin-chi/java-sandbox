@@ -36,7 +36,7 @@ public class TransactionService {
                 .and(TransactionSpecifications.hasAccountTier(req.getAccountTier()))
                 .and(TransactionSpecifications.isUnreviewed(req.getUnreviewed()))
                 .and(TransactionSpecifications.containsKeyword(req.getKeyword()))
-                .and(TransactionSpecifications.hasFailedTransaction(req.getHasFaildTransaction()));
+                .and(TransactionSpecifications.hasFailedTransaction(req.getHasFailedTransaction()));
 
         Page<Transaction> page = transactionRepository.findAll(spec, pageable);
 

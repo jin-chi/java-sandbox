@@ -42,7 +42,7 @@ public class TransactionRequestDto {
     @Size(min = 1, max = 100, message = "1文字以上100文字以下で指定してください")
     private String keyword;
 
-    private Boolean hasFaildTransaction;
+    private Boolean hasFailedTransaction;
 
     public boolean isEmpty() {
         return !StringUtils.hasText(transactionRef)
@@ -55,6 +55,6 @@ public class TransactionRequestDto {
                 && accountTier == null
                 && (unreviewed == null || !unreviewed)
                 && !StringUtils.hasText(keyword)
-                && (hasFaildTransaction == null || !hasFaildTransaction);
+                && (hasFailedTransaction == null || !hasFailedTransaction);
     }
 }
