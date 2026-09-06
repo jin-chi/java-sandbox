@@ -3,6 +3,9 @@ package com.example.transaction_search.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import com.example.transaction_search.entity.AccountTier;
 import com.example.transaction_search.entity.TransactionType;
 
@@ -40,4 +43,18 @@ public class TransactionRequestDto {
     private String keyword;
 
     private Boolean hasFaildTransaction;
+
+    public boolean isEmpty() {
+        return !StringUtils.hasText(transactionRef)
+                && CollectionUtils.isEmpty(types)
+                && amountFrom == null
+                && amountTo == null
+                && executedFrom == null
+                && executedTo == null
+                && !StringUtils.hasText(ownerName)
+                && accountTier == null
+                && (unreviewed == null || !unreviewed)
+                && !StringUtils.hasText(keyword)
+                && (hasFaildTransaction == null || !hasFaildTransaction);
+    }
 }
