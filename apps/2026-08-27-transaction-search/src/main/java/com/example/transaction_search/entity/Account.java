@@ -23,10 +23,10 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "account_number", nullable = false)
     private String accountNumber;
 
-    @Column(nullable = false)
+    @Column(name = "owner_name", nullable = false)
     private String ownerName;
 
     @Enumerated(EnumType.STRING)
