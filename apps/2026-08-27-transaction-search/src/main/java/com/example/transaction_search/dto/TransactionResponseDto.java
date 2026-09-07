@@ -10,8 +10,8 @@ import com.example.transaction_search.entity.TransactionType;
 public record TransactionResponseDto(
         Long id,
         String transactionRef,
-        TransactionType transactionType,
-        TransactionStatus transactionStatus,
+        TransactionType type,
+        TransactionStatus status,
         Long amount,
         LocalDateTime executedAt,
         String reviewedBy,
