@@ -40,8 +40,8 @@ public class TransactionService {
 
         Page<Transaction> page = transactionRepository.findAll(spec, pageable);
 
-        if (page == null) {
-            throw new TransactionNotFoundException("Transaction not found");
+        if (page.isEmpty()) {
+            throw new TransactionNotFoundException("検索条件に一致する取引が見つかりませんでした");
         }
 
         return PageResponse.from(page.map(TransactionResponseDto::from));
