@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 
 import com.example.transaction_search.entity.AccountTier;
 import com.example.transaction_search.entity.Transaction;
+import com.example.transaction_search.entity.TransactionStatus;
 import com.example.transaction_search.entity.TransactionType;
 
 import jakarta.persistence.criteria.Root;
@@ -91,7 +92,9 @@ public class TransactionSpecifications {
             Subquery<Integer> subquery = query.subquery(Integer.class);
             Root<Transaction> subRoot = subquery.from(Transaction.class);
             subquery.select(cb.literal(1));
-            subquery.where(cb.equal(subRoot.get("status"), "FAILED"));
+            subquery.where(
+                    cb.equal(subRoot.get("account"), root.get("account")),
+                    cb.equal(subRoot.get("status"), TransactionStatus.FAILED));
             return cb.exists(subquery);
         };
     }
