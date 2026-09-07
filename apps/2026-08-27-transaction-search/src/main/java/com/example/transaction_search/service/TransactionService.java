@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.transaction_search.dto.PageResponse;
 import com.example.transaction_search.dto.TransactionRequestDto;
@@ -14,6 +15,7 @@ import com.example.transaction_search.repository.TransactionRepository;
 import com.example.transaction_search.repository.TransactionSpecifications;
 
 @Service
+@Transactional(readOnly = true)
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
