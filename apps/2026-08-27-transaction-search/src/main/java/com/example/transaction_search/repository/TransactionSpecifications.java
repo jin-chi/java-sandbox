@@ -30,23 +30,23 @@ public class TransactionSpecifications {
         return (root, query, cb) -> !CollectionUtils.isEmpty(types) ? root.get("type").in(types) : cb.conjunction();
     }
 
-    public static Specification<Transaction> amountFrom(Long amountFrom) {
+    public static Specification<Transaction> amountGreaterThanOrEqual(Long amountFrom) {
         return (root, query, cb) -> amountFrom != null ? cb.greaterThanOrEqualTo(root.get("amount"), amountFrom)
                 : cb.conjunction();
     }
 
-    public static Specification<Transaction> amountTo(Long amountTo) {
+    public static Specification<Transaction> amountLessThanOrEqual(Long amountTo) {
         return (root, query, cb) -> amountTo != null ? cb.lessThanOrEqualTo(root.get("amount"), amountTo)
                 : cb.conjunction();
     }
 
-    public static Specification<Transaction> executedFrom(LocalDate executedFrom) {
+    public static Specification<Transaction> executedAtGreaterThanOrEqual(LocalDate executedFrom) {
         return (root, query, cb) -> executedFrom != null
                 ? cb.greaterThanOrEqualTo(root.get("executedAt"), executedFrom.atStartOfDay())
                 : cb.conjunction();
     }
 
-    public static Specification<Transaction> executedTo(LocalDate executedTo) {
+    public static Specification<Transaction> executedAtLessThan(LocalDate executedTo) {
         return (root, query, cb) -> executedTo != null
                 ? cb.lessThan(root.get("executedAt"), executedTo.plusDays(1).atStartOfDay())
                 : cb.conjunction();
