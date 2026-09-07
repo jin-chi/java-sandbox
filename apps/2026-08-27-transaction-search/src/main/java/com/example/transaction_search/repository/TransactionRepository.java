@@ -12,5 +12,5 @@ import com.example.transaction_search.entity.Transaction;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, JpaSpecificationExecutor<Transaction> {
 
     @EntityGraph(attributePaths = "account")
-    public Page<Transaction> findAll(Specification<Transaction> spec, Pageable pageable);
+    Page<Transaction> findAll(Specification<Transaction> spec, Pageable pageable);
 }
