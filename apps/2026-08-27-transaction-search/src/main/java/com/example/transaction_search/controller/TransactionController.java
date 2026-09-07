@@ -18,7 +18,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/transactions")
 public class TransactionController {
 
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
