@@ -35,7 +35,7 @@ public class Claim {
     // 請求ステータス
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ClaimStatus claimStatus;
+    private ClaimStatus status;
 
     // 請求金額
     @Column(nullable = false)

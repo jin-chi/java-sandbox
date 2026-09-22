@@ -42,7 +42,7 @@ public class Policy {
     // 商品種別
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProductType ProductType;
+    private ProductType productType;
 
     // 契約ステータス
     @Enumerated(EnumType.STRING)
