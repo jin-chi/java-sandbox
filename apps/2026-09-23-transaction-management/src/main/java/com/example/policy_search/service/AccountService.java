@@ -65,4 +65,25 @@ public class AccountService {
         Thread.sleep(10000);
         a.setBalance(a.getBalance() - 100);
     }
+
+    @Transactional
+    public void deadlockTest(Long firstId, Long secondId) throws InterruptedException {
+        Long a = Math.min(firstId, secondId);
+        Long b = Math.max(firstId, secondId);
+
+        Account first = repo.findByIdForUpdate(a).orElseThrow();
+        Thread.sleep(5000);
+        Account second = repo.findByIdForUpdate(b).orElseThrow();
+
+        first.setBalance(first.getBalance() - 100);
+        second.setBalance(second.getBalance() + 100);
+    }
+
+    @Transactional
+    public void dirtyReadTest(Long id) throws InterruptedException {
+        Account a = repo.findById(id).orElseThrow();
+        a.setBalance(99999L);
+        repo.flush();
+        Thread.sleep(10000);
+    }
 }

@@ -72,4 +72,16 @@ public class TxTestController {
         accountService.lockTest(id);
         return "ok";
     }
+
+    @PostMapping("/deadlock")
+    public String deadlock(@RequestParam Long firstId, @RequestParam Long secondId) throws InterruptedException {
+        accountService.deadlockTest(firstId, secondId);
+        return "ok";
+    }
+
+    @PostMapping("/dirtyread/{id}")
+    public String dirtyread(@PathVariable Long id) throws InterruptedException {
+        accountService.dirtyReadTest(id);
+        return "ok";
+    }
 }
