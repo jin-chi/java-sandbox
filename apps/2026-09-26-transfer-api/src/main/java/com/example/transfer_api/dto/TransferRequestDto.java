@@ -19,13 +19,7 @@ public class TransferRequestDto {
     @Min(value = 1, message = "1以上の値を指定してください")
     private Long amount;
 
-    public boolean isEmpty() {
-        return fromAccountId == null
-                && toAccountId == null
-                && amount == null;
-    }
-
-    @AssertTrue(message = "送金元と送金先に同じ口座を指定することできません")
+    @AssertTrue(message = "送金元と送金先に同じ口座を指定できません")
     public boolean isDifferentAccount() {
         if (fromAccountId == null || toAccountId == null)
                 return true;
